@@ -6,6 +6,7 @@ Session.__index = Session
 function Session.new(startExp, startLevel)
   local self = setmetatable({}, Session)
   self.startTime = os.time()
+  self.immutableStartTime = self.startTime
   self.duration = 0
   self.startExp = startExp
   self.exp = startExp
@@ -15,6 +16,13 @@ function Session.new(startExp, startLevel)
 end
 
 function Session:update(exp, level)
+  -- reset the session on level up, because the amount of
+  -- exp gained changes depending on your level
+  if level > self.level then
+    self.startTime = os.time()
+    self.duration = 0
+    self.startExp = exp
+  end
   self.exp = exp
   self.level = level
 end
