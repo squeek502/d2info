@@ -43,15 +43,17 @@ local secondsPerHour = secondsPerMin * 60
 local secondsPerDay = secondsPerHour * 24
 function utils.friendlyTime(seconds, days)
   if seconds == nil then
-    return "∞"
-  elseif days and seconds > secondsPerDay then
+    return "-"
+  elseif days and seconds >= secondsPerDay then
     return string.format("%ud%02uh", math.floor(seconds / secondsPerDay), (seconds % secondsPerDay) / secondsPerHour)
-  elseif seconds > secondsPerHour*10 then
+  elseif seconds >= secondsPerHour*10 then
     return string.format("%uh", math.floor(seconds / secondsPerHour))
-  elseif seconds > secondsPerHour then
+  elseif seconds >= secondsPerHour then
     return string.format("%uh%um", math.floor(seconds / secondsPerHour), (seconds % secondsPerHour) / secondsPerMin)
-  else
+  elseif seconds >= secondsPerMin then
     return string.format("%um%02us", math.floor(seconds / secondsPerMin), seconds % secondsPerMin)
+  else
+    return string.format("%02usec", seconds)
   end
 end
 
