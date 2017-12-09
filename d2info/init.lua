@@ -6,7 +6,7 @@ local friendlyNumber = require('d2info.utils').friendlyNumber
 local friendlyTime = require('d2info.utils').friendlyTime
 local Session = require('d2info.session')
 
-memreader.debug_privilege(true)
+memreader.debugprivilege(true)
 local reader = D2Reader.new()
 local sessions = {}
 local lastPlayer = nil

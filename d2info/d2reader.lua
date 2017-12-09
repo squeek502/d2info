@@ -62,10 +62,10 @@ function D2Reader:init()
 end
 
 function D2Reader:openProcess()
-  local window = memreader.find_window(constants.windowTitle)
+  local window = memreader.findwindow(constants.windowTitle)
   if window then
     local pid = window.pid
-    return assert(memreader.open_process(pid))
+    return assert(memreader.openprocess(pid))
   end
 end
 
@@ -74,7 +74,7 @@ function D2Reader:onExit()
 end
 
 function D2Reader:checkStatus()
-  if self.process and self.process:exit_code() then
+  if self.process and self.process:exitcode() then
     self:onExit()
   end
   if not self.process or self.status ~= nil then
