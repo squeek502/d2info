@@ -61,12 +61,26 @@ function D2Reader:init()
   self.status = nil
 end
 
-function D2Reader:openProcess()
+-- finding the process by window title is fast but can lead to false positives
+-- or fail to find it if there are multiple windows with the same title
+local function openProcessFast()
   local window = memreader.findwindow(constants.windowTitle)
   if window then
-    local pid = window.pid
-    return assert(memreader.openprocess(pid))
+    local process = assert(memreader.openprocess(window.pid))
+    return process.name:lower() == constants.exe:lower() and process or nil
   end
+end
+
+local function openProcess()
+  for pid, name in memreader.processes() do
+    if name:lower() == constants.exe:lower() then
+      return assert(memreader.openprocess(pid))
+    end
+  end
+end
+
+function D2Reader:openProcess()
+  return openProcessFast() or openProcess()
 end
 
 function D2Reader:onExit()
