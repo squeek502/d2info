@@ -40,7 +40,7 @@ function D2Reader:init()
     return
   end
 
-  for _,mod in ipairs(self.process:modules()) do
+  for mod in self.process:modules() do
     if string.lower(mod.name) == "plugy.dll" then
       self.isPlugY = true
     end
