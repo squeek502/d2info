@@ -47,7 +47,7 @@ function Session:durationExpPerMin()
 end
 
 local function secondsToNextLevel(exp, level, expGained, duration)
-  if level == 99 then return nil end
+  if level == 99 or expGained == 0 then return nil end
   local expNeeded = constants.experience[level+1] - exp
   local expPerMin = expPerMin(expGained, duration)
   local minsNeeded = expNeeded / expPerMin
