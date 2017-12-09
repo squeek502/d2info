@@ -62,10 +62,10 @@ function D2Reader:init()
 end
 
 function D2Reader:openProcess()
-  for _, pid in ipairs(memreader.process_ids()) do
-    if memreader.process_name(pid) == constants.exe then
-      return assert(memreader.open_process(pid))
-    end
+  local window = memreader.find_window(constants.windowTitle)
+  if window then
+    local pid = window.pid
+    return assert(memreader.open_process(pid))
   end
 end
 

@@ -19,6 +19,7 @@ return {
   },
 
   exe = "Game.exe",
+  windowTitle = "Diablo II",
 
   stats = {
     strength                = 0,
