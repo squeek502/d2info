@@ -43,5 +43,5 @@ Est time until level 96:
 
 ## Acknowledgements
 
-[DiabloInterface](https://github.com/Zutatensuppe/DiabloInterface) for information about the memory layout of D2 and techniques for reading its memory
-[PlugY](http://plugy.free.fr/en/index.html) for information about the memory layout of D2 and how to determine the version of the game process
+- [DiabloInterface](https://github.com/Zutatensuppe/DiabloInterface) for information about the memory layout of D2 and techniques for reading its memory
+- [PlugY](http://plugy.free.fr/en/index.html) for information about the memory layout of D2 and how to determine the version of the game process
