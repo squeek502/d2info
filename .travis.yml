@@ -8,7 +8,7 @@ addons:
 
 install:
 - pip install --user hererocks
-- hererocks here --l5.1 -rlatest
+- hererocks here --lua 5.1 -r latest
 - export PATH="$PWD/here/bin:$PATH"
 
 cache:
