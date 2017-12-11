@@ -16,19 +16,6 @@ function utils.tableMerge(a, b)
   return merged
 end
 
--- Write to the console by overwriting the line using CR
--- Uses spaces to cover up the last message when needed
-local lastLen = 0
-function utils.consoleWrite(msg)
-  local len = #msg
-  io.write('\r')
-  io.write(msg)
-  if len < lastLen then
-    io.write(string.rep(' ', lastLen-len))
-  end
-  lastLen = len
-end
-
 function utils.friendlyNumber(num)
   if num > 1000000 then
     return string.format("%0.2fm", num / 1000000)
