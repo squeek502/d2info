@@ -4,7 +4,7 @@
 # Should be executed from root d2info directory.
 # Resulting binary will be in `build/d2info.exe`.
 
-set -eufo pipefail
+set -euo pipefail
 
 ROOT_DIR=$PWD
 BUILD_DIR=$ROOT_DIR/build
