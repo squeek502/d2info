@@ -6,6 +6,14 @@ addons:
     packages:
     - gcc-mingw-w64
 
+install:
+- pip install --user hererocks
+- hererocks here --l5.1 -rlatest
+- export PATH="$PWD/here/bin:$PATH"
+
+cache:
+  directories: here
+
 script:
 - "./scripts/build-luastatic.sh"
 

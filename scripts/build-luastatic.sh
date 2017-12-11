@@ -4,6 +4,8 @@
 # Should be executed from root d2info directory.
 # Resulting binary will be in `build/d2info.exe`.
 
+set -eufo pipefail
+
 ROOT_DIR=$PWD
 BUILD_DIR=$ROOT_DIR/build
 
@@ -13,6 +15,9 @@ cd build
 
 LUA_VERSION=5.1.5
 
+# ensure luastatic is available
+which luastatic
+
 echo
 echo "=== Downloading Lua $LUA_VERSION ==="
 echo
@@ -21,19 +26,19 @@ curl https://www.lua.org/ftp/lua-$LUA_VERSION.tar.gz | tar xz
 echo
 echo "=== Downloading memreader ==="
 echo
-git clone https://github.com/squeek502/memreader.git || exit 1
+git clone https://github.com/squeek502/memreader.git
 
 echo
 echo "=== Downloading sleep ==="
 echo
-git clone https://github.com/squeek502/sleep.git || exit 1
+git clone https://github.com/squeek502/sleep.git
 
 echo
 echo "=== Building Lua ==="
 echo
 cd lua-$LUA_VERSION
 make mingw CC=x86_64-w64-mingw32-gcc AR="x86_64-w64-mingw32-ar rcu"
-cp src/liblua.a $BUILD_DIR || exit 1
+cp src/liblua.a $BUILD_DIR
 cd $BUILD_DIR
 
 echo
@@ -42,7 +47,7 @@ echo
 cd memreader
 cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
 make
-cp libmemreader.a $BUILD_DIR || exit 1
+cp libmemreader.a $BUILD_DIR
 cd $BUILD_DIR
 
 echo
@@ -51,7 +56,7 @@ echo
 cd sleep
 cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
 make
-cp libsleep.a $BUILD_DIR || exit 1
+cp libsleep.a $BUILD_DIR
 cd $BUILD_DIR
 
 echo
@@ -64,6 +69,6 @@ echo
 echo "=== Building d2info.exe ==="
 echo
 CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libsleep.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
-strip d2info.exe || exit 1
+strip d2info.exe
 
 cd $ROOT_DIR
