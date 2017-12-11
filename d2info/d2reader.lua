@@ -29,7 +29,7 @@ function D2Reader:init()
 
   local version, err = self.process:version()
   if not version then
-    self.status = "Error: " .. err
+    self.status = "Error obtaining Game.exe version: " .. err
     return
   end
 
