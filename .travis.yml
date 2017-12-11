@@ -1,0 +1,22 @@
+language: c
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - gcc-mingw-w64
+
+script:
+- "./scripts/build-luastatic.sh"
+
+notifications:
+  email: true
+
+deploy:
+  provider: releases
+  api_key:
+    secure: TNVCTpMepIfc57XYbsTtlc8QYqXm1kPhPR0J0Pl0C0S6soJZlqJqSltauHkygbs99erRRxyunajnslW0gI71hnSfzJ7UMDLhkZftsl0lKUM0gdqvOy3EKL0Wf88XDs2crsibjf+mqQFsbj0KDk+lbrcOc48agfoRcuSuBAREofD87S1qSXNx2IHoSdJTEgCBE64E6Aenfx18sHRnu5Q1VvOeCKqcIN02oRIiq97fKgsQZDeAz9dTcY2BDmseqtaZPtsFg5JroFh6du9n2770JoyMCaeoZOIf6tSaRX2jylfhZ6wJBLAVmyZECkGc1Uh5Cp+4Qhomu2uzjE0hOK9Nf6TUCVoc6fV+L5piIflTG+kM0GB8PIqQgD/yCJTkk29tLNLHROQgewp0lEownxPG7pMfYuOKy5X2YUDylEaDggn9uOK92Dg/syGT6Y+xvzPodyCHIHftJJsg3f/Kugx9az4ow1qBioeQPPk3FOIxD6fQyN4fTfzyUSLZ6BYowWMhFRvkLwyE6oINTGGzDSwFGucQ4N+vO/j/HafyyLIJGZPN9rBGDcIsFz8tkbA3tuEf1/aSBUa7dnE+JadIgnRkvYJDfWh9kdi7omy5YypA/p3kC9DMNYng53S8VLHtyvXmn/ewEsVH4eZvRASsDpArSJDXK/hnyP/XHJWYMHUfUZ0=
+  file: build/d2info.exe
+  on:
+    repo: squeek502/d2info
+    tags: true
