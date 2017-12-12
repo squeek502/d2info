@@ -30,6 +30,7 @@ function D2Reader:init()
   local version, err = self.process:version()
   if not version then
     self.status = "Error obtaining Game.exe version: " .. err
+    self.process = nil
     return
   end
 
@@ -66,8 +67,10 @@ end
 local function openProcessFast()
   local window = memreader.findwindow(constants.windowTitle)
   if window then
-    local process = assert(memreader.openprocess(window.pid))
-    return process.name:lower() == constants.exe:lower() and process or nil
+    local process = memreader.openprocess(window.pid)
+    if process and process.name:lower() == constants.exe:lower() then
+      return process
+    end
   end
 end
 
@@ -100,7 +103,7 @@ end
 function D2Reader:getPlayerPointer()
   if not self:checkStatus() then return end
   local data, err = self.process:read(self.base + self.offsets.player, 4)
-  if not data then return nil, err end
+  if err then return nil, err end
   local playerUnitPtr = uint32(data)
   return playerUnitPtr ~= 0 and playerUnitPtr or nil
 end
@@ -109,8 +112,10 @@ function D2Reader:getPlayerName()
   if not self:checkStatus() then return end
   local player = self:getPlayerPointer()
   if player then
-    local unitDataPtr = uint32(self.process:read(player + self.offsets.playerData, 4))
-    local playerName = self.process:read(unitDataPtr + self.offsets.playerName, 16)
+    local data, err = self.process:read(player + self.offsets.playerData, 4)
+    if err then return nil, err end
+    local unitDataPtr = uint32(data)
+    local playerName = assert(self.process:read(unitDataPtr + self.offsets.playerName, 16))
     return binary.null_terminate(playerName)
   end
 end
@@ -119,11 +124,11 @@ function D2Reader:getExperience()
   if not self:checkStatus() then return end
   local player = self:getPlayerPointer()
   if player then
-    local playerStatListPtr = uint32(self.process:read(player + self.offsets.statList, 4))
-    local fullStatsData = self.process:read(playerStatListPtr + self.offsets.fullStats, 8)
+    local playerStatListPtr = uint32(assert(self.process:read(player + self.offsets.statList, 4)))
+    local fullStatsData = assert(self.process:read(playerStatListPtr + self.offsets.fullStats, 8))
     local fullStatsPtr = uint32(fullStatsData)
     local fullStatsLength = uint16(fullStatsData, 4)
-    local fullStatsArray = self.process:read(fullStatsPtr, fullStatsLength * 8)
+    local fullStatsArray = assert(self.process:read(fullStatsPtr, fullStatsLength * 8))
 
     local exp = 0
     local lvl = 1
@@ -135,6 +140,12 @@ function D2Reader:getExperience()
       elseif lo == constants.stats.level then
         lvl = v
       end
+    end
+
+    -- sanity check: level gets loaded into the array before experience, so check to make sure
+    -- we're not getting a false 0 experience by comparing exp to level
+    if exp < constants.experience[lvl] then
+      return
     end
 
     return exp, lvl

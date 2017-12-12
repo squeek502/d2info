@@ -13,9 +13,8 @@ local UPDATE_PERIOD = 1000
 
 while true do
   local player = reader:getPlayerName()
-  if player then
-    local exp, lvl = reader:getExperience()
-
+  local exp, lvl = reader:getExperience()
+  if player and exp then
     if not sessions[player] then
       sessions[player] = {}
       sessions[player].total = Session.new(exp, lvl)
