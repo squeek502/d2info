@@ -49,8 +49,10 @@ while true do
     end
 
     -- need to update files here because otherwise they wouldn't update
-    -- while at the menu screen
-    output:toFile(lastInfo.player, lastInfo.level, sessions[lastInfo.player].total, sessions[lastInfo.player].current, sessions[lastInfo.player].last)
+    -- while at the menu screen during save+quit
+    if lastInfo.player then
+      output:toFile(lastInfo.player, lastInfo.level, sessions[lastInfo.player].total, sessions[lastInfo.player].current, sessions[lastInfo.player].last)
+    end
   end
   sleep(UPDATE_PERIOD)
 end
