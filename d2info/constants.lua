@@ -21,6 +21,12 @@ return {
   exe = "Game.exe",
   windowTitle = "Diablo II",
 
+  gui = {
+    expBar = {
+      ticks=120,
+    }
+  },
+
   stats = {
     strength                = 0,
     energy                  = 1,

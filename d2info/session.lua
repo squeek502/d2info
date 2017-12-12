@@ -1,4 +1,5 @@
 local constants = require('d2info.constants')
+local utils = require('d2info.utils')
 
 local Session = {}
 Session.__index = Session
@@ -32,6 +33,15 @@ function Session:incrementDuration(inc)
   self.duration = self.duration + inc
 end
 
+function Session:expGained()
+  return self.exp - self.startExp
+end
+
+function Session:ticksGained()
+  local gainedIntoLevel = constants.experience[self.level] + self:expGained()
+  return utils.expToTicks(gainedIntoLevel, self.level)
+end
+
 local function expPerMin(expGained, duration)
   local mins = duration / 60
   if mins == 0 then return 0 end
@@ -39,11 +49,11 @@ local function expPerMin(expGained, duration)
 end
 
 function Session:realTimeExpPerMin()
-  return expPerMin(self.exp - self.startExp, os.time() - self.startTime)
+  return expPerMin(self:expGained(), os.time() - self.startTime)
 end
 
 function Session:durationExpPerMin()
-  return expPerMin(self.exp - self.startExp, self.duration)
+  return expPerMin(self:expGained(), self.duration)
 end
 
 local function secondsToNextLevel(exp, level, expGained, duration)
@@ -55,11 +65,11 @@ local function secondsToNextLevel(exp, level, expGained, duration)
 end
 
 function Session:realTimeToNextLevel()
-  return secondsToNextLevel(self.exp, self.level, self.exp - self.startExp, os.time() - self.startTime)
+  return secondsToNextLevel(self.exp, self.level, self:expGained(), os.time() - self.startTime)
 end
 
 function Session:gameTimeToNextLevel()
-  return secondsToNextLevel(self.exp, self.level, self.exp - self.startExp, self.duration)
+  return secondsToNextLevel(self.exp, self.level, self:expGained(), self.duration)
 end
 
 return Session

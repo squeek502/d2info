@@ -1,3 +1,4 @@
+local constants = require('d2info.constants')
 local utils = {}
 
 function utils.friendlyVersion(ver)
@@ -17,21 +18,24 @@ function utils.tableMerge(a, b)
 end
 
 function utils.friendlyNumber(num)
-  if num > 1000000 then
-    return string.format("%0.2fm", num / 1000000)
-  elseif num > 1000 then
+  local abs = math.abs(num)
+  if abs >= 1000000000 then
+    return string.format("%0.1fb", num / 1000000000)
+  elseif abs >= 1000000 then
+    return string.format("%0.1fm", num / 1000000)
+  elseif abs >= 1000 then
     return string.format("%0.1fk", num / 1000)
   end
-  return string.format("%u", num)
+  return string.format("%d", num)
 end
 
 local secondsPerMin = 60
 local secondsPerHour = secondsPerMin * 60
 local secondsPerDay = secondsPerHour * 24
-function utils.friendlyTime(seconds, days)
-  if seconds == nil then
+function utils.friendlyTime(seconds, showDays)
+  if seconds == nil or seconds < 0 then
     return "-"
-  elseif days and seconds >= secondsPerDay then
+  elseif showDays and seconds >= secondsPerDay then
     return string.format("%ud%02uh", math.floor(seconds / secondsPerDay), (seconds % secondsPerDay) / secondsPerHour)
   elseif seconds >= secondsPerHour*10 then
     return string.format("%uh", math.floor(seconds / secondsPerHour))
@@ -42,6 +46,26 @@ function utils.friendlyTime(seconds, days)
   else
     return string.format("%02usec", seconds)
   end
+end
+
+function utils.printf(...)
+  print(string.format(...))
+end
+
+function utils.toFile(filename, txt)
+  local f = assert(io.open(filename, "w"))
+  f:write(txt)
+  f:close()
+end
+
+-- Converts exp to GUI 'ticks' of the experience bar
+function utils.expToTicks(exp, level)
+  if level == 99 then return 0 end
+  local maxTicks = constants.gui.expBar.ticks
+  local expRange = constants.experience[level+1] - constants.experience[level]
+  local expGotten = exp - constants.experience[level]
+  local percentLeveled = expGotten / expRange
+  return percentLeveled * maxTicks
 end
 
 return utils

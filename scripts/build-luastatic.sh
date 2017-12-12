@@ -14,9 +14,11 @@ mkdir build
 cd build
 
 LUA_VERSION=5.1.5
+LFS_VERSION=1.7.0-2
 
-# ensure luastatic is available
-which luastatic
+# ensure luastatic and luarocks are available
+which luastatic || { echo "luastatic not found"; exit 1; }
+which luarocks || { echo "luarocks not found"; exit 1; }
 
 echo
 echo "=== Downloading Lua $LUA_VERSION ==="
@@ -32,6 +34,11 @@ echo
 echo "=== Downloading sleep ==="
 echo
 git clone https://github.com/squeek502/sleep.git
+
+echo
+echo "=== Downloading LuaFileSystem $LFS_VERSION ==="
+echo
+luarocks unpack luafilesystem $LFS_VERSION
 
 echo
 echo "=== Building Lua ==="
@@ -60,6 +67,15 @@ cp libsleep.a $BUILD_DIR
 cd $BUILD_DIR
 
 echo
+echo "=== Building LuaFileSystem $LFS_VERSION ==="
+echo
+cd luafilesystem-$LFS_VERSION/luafilesystem
+x86_64-w64-mingw32-gcc -c -O2 src/lfs.c -I$BUILD_DIR/lua-$LUA_VERSION/src -o src/lfs.o
+x86_64-w64-mingw32-ar rcs src/lfs.a src/lfs.o
+cp src/lfs.a $BUILD_DIR
+cd $BUILD_DIR
+
+echo
 echo "=== Copying d2info sources ==="
 echo
 cp -r $ROOT_DIR/d2info $BUILD_DIR
@@ -68,7 +84,7 @@ cp $ROOT_DIR/d2info.lua $BUILD_DIR
 echo
 echo "=== Building d2info.exe ==="
 echo
-CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libsleep.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
+CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libsleep.a lfs.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
 strip d2info.exe
 
 cd $ROOT_DIR

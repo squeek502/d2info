@@ -1,17 +1,17 @@
 local memreader = require('memreader')
 local D2Reader = require('d2info.d2reader')
 local sleep = require('sleep')
-local friendlyNumber = require('d2info.utils').friendlyNumber
-local friendlyTime = require('d2info.utils').friendlyTime
 local Session = require('d2info.session')
+local Output = require('d2info.output')
 
 memreader.debugprivilege(true)
 local reader = D2Reader.new()
 local sessions = {}
-local lastPlayer = nil
+local output = Output.new()
+local lastInfo = {}
+local UPDATE_PERIOD = 1000
 
 while true do
-  os.execute('cls')
   local player = reader:getPlayerName()
   if player then
     local exp, lvl = reader:getExperience()
@@ -20,7 +20,7 @@ while true do
       sessions[player] = {}
       sessions[player].total = Session.new(exp, lvl)
     end
-    if player ~= lastPlayer then
+    if sessions[player].current == nil then
       sessions[player].current = Session.new(exp, lvl)
     end
 
@@ -28,30 +28,29 @@ while true do
     current:update(exp, lvl)
     total:update(exp, lvl)
 
-    print(string.format("%s\n", player))
-    print(string.format("Overall (real-time): %s xp/min", friendlyNumber(total:realTimeExpPerMin())))
-    print(string.format("Overall (game-time): %s xp/min", friendlyNumber(total:durationExpPerMin())))
-    print(string.format("Current game: %s xp/min", friendlyNumber(current:realTimeExpPerMin())))
-    print(string.format("Last game: %s xp/min", last and friendlyNumber(last:durationExpPerMin()) or "?"))
-    print(string.format("\nEst time until level %d:", lvl+1))
-    print(string.format(" %s (using real-time xp/min)", friendlyTime(total:realTimeToNextLevel())))
-    print(string.format(" %s (using game-time xp/min)", friendlyTime(total:gameTimeToNextLevel())))
-    print(string.format(" %s (using current game's xp/min)", friendlyTime(current:gameTimeToNextLevel())))
-    print(string.format(" %s (using last game's xp/min)", last and friendlyTime(last:gameTimeToNextLevel()) or "?"))
+    output:toScreen(player, lvl, total, current, last)
+    output:toFile(player, lvl, total, current, last)
 
     current:incrementDuration()
     total:incrementDuration()
 
-    lastPlayer = player
+    lastInfo.player = player
+    lastInfo.level = lvl
   elseif reader.status ~= nil then
+    os.execute('cls')
     print(reader.status)
   else
+    os.execute('cls')
     print("No player")
 
-    if lastPlayer ~= nil then
-      sessions[lastPlayer].last = sessions[lastPlayer].current
-      lastPlayer = nil
+    if lastInfo.player ~= nil and sessions[lastInfo.player].current ~= nil then
+      sessions[lastInfo.player].last = sessions[lastInfo.player].current
+      sessions[lastInfo.player].current = nil
     end
+
+    -- need to update files here because otherwise they wouldn't update
+    -- while at the menu screen
+    output:toFile(lastInfo.player, lastInfo.level, sessions[lastInfo.player].total, sessions[lastInfo.player].current, sessions[lastInfo.player].last)
   end
-  sleep(1000)
+  sleep(UPDATE_PERIOD)
 end

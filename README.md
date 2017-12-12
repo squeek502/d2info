@@ -21,13 +21,14 @@ Simply grab the [latest .exe build from the releases page](https://github.com/sq
 
 ### Running using Lua
 
-- Build [memreader](https://github.com/squeek502/memreader) and [sleep](https://github.com/squeek502/sleep) and make the resulting .dll's available to Lua's `package.cpath`.
+- Build [memreader](https://github.com/squeek502/memreader), [sleep](https://github.com/squeek502/sleep), and [luafilesystem](https://github.com/keplerproject/luafilesystem) and make the resulting .dll's available to Lua's `package.cpath`.
 - Run `lua d2info.lua`
 
-## Sample Output
+## Output
 
-Currently, the information is just output to the console window. Soon, data will be (optionally?) put into files so that it can easily be added to stream overlays.
+The information is output to both the console window and to individual text files (in the directory `output`, relative to d2info) to allow the info to be easily added to stream overlays.
 
+Console output example:
 ```
 CoolGuy
 
@@ -41,6 +42,14 @@ Est time until level 96:
  11h (using game-time xp/min)
  23h (using current game's xp/min)
  8h22m (using last game's xp/min)
+
+Exp gained (overall): 2.4m
+Exp gained (current game): 179.8k
+Exp gained (last game): 156.1k
+
+Ticks gained (overall): 1.4
+Ticks gained (current game): 0.1
+Ticks gained (last game): 0.1
 ```
 
 ## Acknowledgements
