@@ -99,7 +99,9 @@ end
 
 function D2Reader:getPlayerPointer()
   if not self:checkStatus() then return end
-  local playerUnitPtr = uint32(self.process:read(self.base + self.offsets.player, 4))
+  local data, err = self.process:read(self.base + self.offsets.player, 4)
+  if not data then return nil, err end
+  local playerUnitPtr = uint32(data)
   return playerUnitPtr ~= 0 and playerUnitPtr or nil
 end
 
