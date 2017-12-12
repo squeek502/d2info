@@ -15,6 +15,8 @@ cd build
 
 LUA_VERSION=5.1.5
 LFS_VERSION=1.7.0-2
+SLEEP_VERSION=1.0.0-2
+MEMREADER_VERSION=1.0.0-1
 
 # ensure luastatic and luarocks are available
 which luastatic || { echo "luastatic not found"; exit 1; }
@@ -26,14 +28,14 @@ echo
 curl https://www.lua.org/ftp/lua-$LUA_VERSION.tar.gz | tar xz
 
 echo
-echo "=== Downloading memreader ==="
+echo "=== Downloading memreader $MEMREADER_VERSION ==="
 echo
-git clone https://github.com/squeek502/memreader.git
+luarocks unpack memreader $MEMREADER_VERSION
 
 echo
-echo "=== Downloading sleep ==="
+echo "=== Downloading sleep $SLEEP_VERSION ==="
 echo
-git clone https://github.com/squeek502/sleep.git
+luarocks unpack sleep $SLEEP_VERSION
 
 echo
 echo "=== Downloading LuaFileSystem $LFS_VERSION ==="
@@ -51,7 +53,7 @@ cd $BUILD_DIR
 echo
 echo "=== Building memreader ==="
 echo
-cd memreader
+cd memreader-$MEMREADER_VERSION/memreader
 cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
 make
 cp libmemreader.a $BUILD_DIR
@@ -60,7 +62,7 @@ cd $BUILD_DIR
 echo
 echo "=== Building sleep ==="
 echo
-cd sleep
+cd sleep-$SLEEP_VERSION/sleep
 cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
 make
 cp libsleep.a $BUILD_DIR
