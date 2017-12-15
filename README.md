@@ -20,8 +20,9 @@ Supports Diablo II verisons 1.11, 1.11b, 1.12, 1.13c, 1.13d, 1.14c, and 1.14d
 
 Simply grab the [latest .exe build from the releases page](https://github.com/squeek502/d2info/releases/latest) and run it.
 
-### Running using Lua
+## Running using Lua
 
+- Clone this repository
 - Build [memreader](https://github.com/squeek502/memreader), [sleep](https://github.com/squeek502/sleep), and [luafilesystem](https://github.com/keplerproject/luafilesystem) and make the resulting .dll's available to Lua's `package.cpath`.
 - Run `lua d2info.lua`
 
