@@ -12,6 +12,7 @@ Currently, it provides the following information:
   - Current game
   - Last game (xp/min of the last game at the point of save+quit)
 - Estimated time until the next level, using the various exp/min readings
+- Number of experience 'ticks' gained (pixels filled in the experience bar)
 
 Supports Diablo II verisons 1.11, 1.11b, 1.12, 1.13c, 1.13d, 1.14c, and 1.14d
 
