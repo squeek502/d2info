@@ -3,8 +3,9 @@ local constants = require('d2info.constants')
 local utils = require('d2info.utils')
 local offsetsTable = require('d2info.offsets')
 local binary = require('d2info.binary')
+local bit = require('bit')
 
-local uint32, uint16 = binary.decode_uint32, binary.decode_uint16
+local uint32, uint16, uint8 = binary.decode_uint32, binary.decode_uint16, binary.decode_uint8
 
 local D2Reader = {}
 D2Reader.__index = D2Reader
@@ -16,6 +17,8 @@ function D2Reader.new()
   self.status = "Initializing"
   self.isPlugY = nil
   self.d2ClientDLL = nil
+  self.d2GameDLL = nil
+  self.d2NetDLL = nil
   self:init()
   return self
 end
@@ -27,20 +30,22 @@ function D2Reader:init()
     return
   end
 
-  local version, err = self.process:version()
-  if not version then
+  local versionInfo, err = self.process:version()
+  if not versionInfo then
     self.status = "Error obtaining Game.exe version: " .. err
     self.process = nil
     return
   end
 
-  version = utils.friendlyVersion(version.file)
+  local version = utils.friendlyVersion(versionInfo.file)
   local d2version = constants.versions[version]
   if not d2version then
     self.status = "Error: Unrecognized Game.exe version: " .. version
     return
   end
 
+  self.isPlugY = false
+  self.d2ClientDLL, self.d2GameDLL, self.d2NetDLL = nil, nil, nil
   for mod in self.process:modules() do
     if string.lower(mod.name) == "plugy.dll" then
       self.isPlugY = true
@@ -48,6 +53,18 @@ function D2Reader:init()
     if string.lower(mod.name) == "d2client.dll" then
       self.d2ClientDLL = mod
     end
+    if string.lower(mod.name) == "d2game.dll" then
+      self.d2GameDLL = mod
+    end
+    if string.lower(mod.name) == "d2net.dll" then
+      self.d2NetDLL = mod
+    end
+  end
+
+  local hasDLLs = self.d2ClientDLL and self.d2GameDLL and self.d2NetDLL
+  if versionInfo.file.minor == 0 and not hasDLLs then
+    self.status = "Waiting for D2 dlls to be loaded"
+    return
   end
 
   self.base = self.d2ClientDLL and self.d2ClientDLL.base or self.process.base
@@ -88,11 +105,16 @@ end
 
 function D2Reader:onExit()
   self.process = nil
+  self.isPlugY = false
+  self.d2ClientDLL, self.d2GameDLL, self.d2NetDLL = nil, nil, nil
+  self.base = nil
+  self.offsets = nil
 end
 
 function D2Reader:checkStatus()
   if self.process and self.process:exitcode() then
     self:onExit()
+    return
   end
   if not self.process or self.status ~= nil then
     self:init()
@@ -149,6 +171,69 @@ function D2Reader:getExperience()
     end
 
     return exp, lvl
+  end
+end
+
+function D2Reader:getArea()
+  if not self:checkStatus() then return end
+  local area = string.byte(assert(self.process:read(self.base + self.offsets.area, 1)))
+  -- this will return nil when not in a game (area = 0)
+  return constants.areas[area]
+end
+
+function D2Reader:getDifficulty()
+  if not self:checkStatus() then return end
+  local gamePtr = self:getGamePointer()
+  if gamePtr then
+    local difficulty = uint8(assert(self.process:read(gamePtr + self.offsets.gameDifficulty, 2)))
+    return constants.difficulties[difficulty]
+  end
+end
+
+function D2Reader:getPlayersX()
+  if not self:checkStatus() then return end
+  local gameBase = self.d2GameDLL and self.d2GameDLL.base or self.base
+  local value = uint8(assert(self.process:read(gameBase + self.offsets.playersX, 2)))
+  -- a value of 0 means that the setting hasn't been set by
+  -- /playersX since D2 started, so the real value is the default of 1
+  return value ~= 0 and value or 1
+end
+
+function D2Reader:getWorldPointer()
+  if not self:checkStatus() then return end
+  local gameBase = self.d2GameDLL and self.d2GameDLL.base or self.base
+  local data, err = self.process:read(gameBase + self.offsets.world, 4)
+  -- treat memory read error here as non-fatal, as this can occur
+  -- when the dlls are unloading at game shutdown
+  if err then return nil, err end
+  local worldPtr = uint32(data)
+  return worldPtr ~= 0 and worldPtr or nil
+end
+
+function D2Reader:getGamePointer()
+  if not self:checkStatus() then return end
+  local netBase = self.d2NetDLL and self.d2NetDLL.base or self.base
+
+  local worldPtr = self:getWorldPointer()
+  if worldPtr then
+    local gameId = uint32(assert(self.process:read(netBase + self.offsets.gameId, 4)))
+    local gameMask = uint32(assert(self.process:read(worldPtr + self.offsets.worldGameMask, 4)))
+    local gameIndex = bit.band(gameId, gameMask)
+    local gameOffset = gameIndex * 0x0C + 0x08
+    local gameBuffer = uint32(assert(self.process:read(worldPtr + self.offsets.worldGameBuffer, 4)))
+    local gamePtr = uint32(assert(self.process:read(gameBuffer + gameOffset, 4)))
+    -- if the sign bit is set, then the pointer is invalid
+    local valid = bit.band(gamePtr, 0x80000000) == 0
+    return (valid and gamePtr ~= 0) and gamePtr or nil
+  end
+end
+
+function D2Reader:getCurrentFrameNumber()
+  if not self:checkStatus() then return end
+  local gamePtr = self:getGamePointer()
+  if gamePtr then
+    local currentFrame = uint32(assert(self.process:read(gamePtr + self.offsets.gameCurrentFrame, 4)))
+    return currentFrame
   end
 end
 

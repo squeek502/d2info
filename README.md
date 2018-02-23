@@ -8,22 +8,26 @@ Currently, it provides the following information:
 
 - Experience per minute over different time periods:
   - Real time (since the character was first seen by the d2info process)
-  - In-game time (only includes time that the character is in a game)
+  - In-game time (only includes time that the character is in a game, not paused, etc)
   - Current game
   - Last game (xp/min of the last game at the point of save+quit)
 - Estimated time until the next level, using the various exp/min readings
+- Number of runs finished, average xp/min per run, estimated runs until the next level
 - Number of experience 'ticks' gained (pixels filled in the experience bar)
+- Information about the current area, like monster level and % xp gain (unfinished, disabled by default; see `SHOW_AREA_INFORMATION` in the config)
 
-Supports Diablo II verisons 1.11, 1.11b, 1.12, 1.13c, 1.13d, 1.14c, and 1.14d
+Supports Diablo II verisons 1.13c, 1.13d, 1.14b, 1.14c, and 1.14d
 
 ## Installation
 
 Simply grab the [latest .exe build from the releases page](https://github.com/squeek502/d2info/releases/latest) and run it.
 
+*Note: You'll probably want to put the .exe in its own folder, as it will output various files relative to its location*
+
 ## Running using Lua
 
 - Clone this repository
-- Build [memreader](https://github.com/squeek502/memreader), [sleep](https://github.com/squeek502/sleep), and [luafilesystem](https://github.com/keplerproject/luafilesystem) and make the resulting .dll's available to Lua's `package.cpath`.
+- Build [memreader](https://github.com/squeek502/memreader), [sleep](https://github.com/squeek502/sleep), [luafilesystem](https://github.com/keplerproject/luafilesystem), and [LuaBitOp](http://bitop.luajit.org/) and make the resulting .dll's available to Lua's `package.cpath`.
 - Run `lua d2info.lua`
 
 ## Output
@@ -32,26 +36,25 @@ The information is output to both the console window and to individual text file
 
 Console output example:
 ```
-CoolGuy
+CharName (level 96 & 32.85%)
+/players 8
 
-Overall (real-time): 167.3k xp/min
-Overall (game-time): 183.2k xp/min
-Current game: 87.5k xp/min
-Last game: 258.7k xp/min
+Run #6:
+ 207.8k xp/min (734.2k xp in 3m32s)
+ 13h until level 97 at this rate
 
-Est time until level 96:
- 12h (using real-time xp/min)
- 11h (using game-time xp/min)
- 23h (using current game's xp/min)
- 8h22m (using last game's xp/min)
+Last run:
+ 160.7k xp/min (576.0k xp in 3m35s)
+ 17h until level 97 at this rate
 
-Exp gained (overall): 2.4m
-Exp gained (current game): 179.8k
-Exp gained (last game): 156.1k
+Average run:
+ 165.0k xp/min (521.0k xp in 3m09s)
+ 315 runs until level 97
 
-Ticks gained (overall): 1.4
-Ticks gained (current game): 0.1
-Ticks gained (last game): 0.1
+This session:
+ +1.6 ticks (+1.36%)
+ 177.8k xp/min (3.3m xp in 19m19s)
+ 15h until level 97 at this rate
 ```
 
 ## Acknowledgements

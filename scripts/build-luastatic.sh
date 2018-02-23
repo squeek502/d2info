@@ -17,6 +17,7 @@ LUA_VERSION=5.1.5
 LFS_VERSION=1.7.0-2
 SLEEP_VERSION=1.0.0-2
 MEMREADER_VERSION=1.0.0-1
+BITOP_VERSION=1.0.2-3
 
 # ensure luastatic and luarocks are available
 which luastatic || { echo "luastatic not found"; exit 1; }
@@ -41,6 +42,11 @@ echo
 echo "=== Downloading LuaFileSystem $LFS_VERSION ==="
 echo
 luarocks unpack luafilesystem $LFS_VERSION
+
+echo
+echo "=== Downloading LuaBitOp $BITOP_VERSION ==="
+echo
+luarocks unpack luabitop $BITOP_VERSION
 
 echo
 echo "=== Building Lua ==="
@@ -78,6 +84,15 @@ cp src/lfs.a $BUILD_DIR
 cd $BUILD_DIR
 
 echo
+echo "=== Building LuaBitOp $BITOP_VERSION ==="
+echo
+cd luabitop-$BITOP_VERSION/luabitop
+x86_64-w64-mingw32-gcc -c -O2 bit.c -I$BUILD_DIR/lua-$LUA_VERSION/src -o bit.o
+x86_64-w64-mingw32-ar rcs bit.a bit.o
+cp bit.a $BUILD_DIR
+cd $BUILD_DIR
+
+echo
 echo "=== Copying d2info sources ==="
 echo
 cp -r $ROOT_DIR/d2info $BUILD_DIR
@@ -86,7 +101,7 @@ cp $ROOT_DIR/d2info.lua $BUILD_DIR
 echo
 echo "=== Building d2info.exe ==="
 echo
-CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libsleep.a lfs.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
+CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libsleep.a lfs.a bit.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
 strip d2info.exe
 
 cd $ROOT_DIR

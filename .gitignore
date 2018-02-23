@@ -1,4 +1,6 @@
 output
+d2info-config.lua
+d2info-config-default.lua
 
 # Created by https://www.gitignore.io/api/lua,linux,windows
 

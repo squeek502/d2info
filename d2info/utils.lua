@@ -58,14 +58,59 @@ function utils.toFile(filename, txt)
   f:close()
 end
 
+function utils.expToPercentLeveled(exp, level)
+  if level == 99 then return 0 end
+  local expRange = constants.experience[level+1] - constants.experience[level]
+  local expGotten = exp - constants.experience[level]
+  return expGotten / expRange
+end
+
 -- Converts exp to GUI 'ticks' of the experience bar
 function utils.expToTicks(exp, level)
   if level == 99 then return 0 end
   local maxTicks = constants.gui.expBar.ticks
-  local expRange = constants.experience[level+1] - constants.experience[level]
-  local expGotten = exp - constants.experience[level]
-  local percentLeveled = expGotten / expRange
+  local percentLeveled = utils.expToPercentLeveled(exp, level)
   return percentLeveled * maxTicks
+end
+
+local underLevel25 = {
+  [10] = 0.02, [9] = 0.15, [8] = 0.36, [7] = 0.68, [6] = 0.88, [-6] = 0.81, [-7] = 0.62, [-8] = 0.43, [-9] = 0.24, [-10] = 0.05
+}
+local level25Plus = {
+  [-6] = 0.81, [-7] = 0.62, [-8] = 0.43, [-9] = 0.24, [-10] = 0.05
+}
+function utils.expLevelDifference(mlvl, clvl)
+  local diff = mlvl-clvl
+  if clvl < 25 then
+    if underLevel25[diff] then
+      return underLevel25[diff]
+    elseif diff > 10 then
+      return 0.02
+    elseif diff < -10 then
+      return 0.05
+    else
+      return 1.0
+    end
+  else
+    -- For any monster above your level, you get EXP*(Player Level / Monster Level).
+    if diff > 0 then
+      return clvl / mlvl
+    elseif level25Plus[diff] then
+      return level25Plus[diff]
+    elseif diff <= -10 then
+      return 0.05
+    else
+      return 1.0
+    end
+  end
+end
+
+function utils.expLevelPenalty(clvl)
+  return constants.experienceLevelPenalties[clvl] or 1
+end
+
+function utils.expGain(mlvl, clvl)
+  return utils.expLevelDifference(mlvl, clvl) * utils.expLevelPenalty(clvl)
 end
 
 return utils
