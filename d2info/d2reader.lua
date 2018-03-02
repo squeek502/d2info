@@ -19,6 +19,7 @@ function D2Reader.new()
   self.d2ClientDLL = nil
   self.d2GameDLL = nil
   self.d2NetDLL = nil
+  self.isD2SE = nil
   self:init()
   return self
 end
@@ -30,18 +31,30 @@ function D2Reader:init()
     return
   end
 
-  local versionInfo, err = self.process:version()
-  if not versionInfo then
-    self.status = "Error obtaining Game.exe version: " .. err
-    self.process = nil
-    return
-  end
+  self.isD2SE = self.process.name:lower() == constants.d2seExe:lower()
 
-  local version = utils.friendlyVersion(versionInfo.file)
-  local d2version = constants.versions[version]
-  if not d2version then
-    self.status = "Error: Unrecognized Game.exe version: " .. version
-    return
+  local d2version
+  local shouldHaveDLLs
+  if self.isD2SE then
+    d2version = assert(self.process:readrelative(offsetsTable["d2se"].d2version, 5))
+    d2version = binary.null_terminate(d2version)
+    shouldHaveDLLs = true
+  else
+    local versionInfo, err = self.process:version()
+    if not versionInfo then
+      self.status = "Error obtaining Game.exe version: " .. err
+      self.process = nil
+      return
+    end
+
+    local version = utils.friendlyVersion(versionInfo.file)
+    d2version = constants.versions[version]
+    shouldHaveDLLs = versionInfo.file.minor == 0
+
+    if not d2version then
+      self.status = "Error: Unrecognized Game.exe version: " .. version
+      return
+    end
   end
 
   self.isPlugY = false
@@ -62,7 +75,7 @@ function D2Reader:init()
   end
 
   local hasDLLs = self.d2ClientDLL and self.d2GameDLL and self.d2NetDLL
-  if versionInfo.file.minor == 0 and not hasDLLs then
+  if shouldHaveDLLs and not hasDLLs then
     self.status = "Waiting for D2 dlls to be loaded"
     return
   end
@@ -79,13 +92,17 @@ function D2Reader:init()
   self.status = nil
 end
 
+local function isValidExe(exe)
+  return constants.exe:lower() == exe:lower() or constants.d2seExe:lower() == exe:lower()
+end
+
 -- finding the process by window title is fast but can lead to false positives
 -- or fail to find it if there are multiple windows with the same title
 local function openProcessFast()
   local window = memreader.findwindow(constants.windowTitle)
   if window then
     local process = memreader.openprocess(window.pid)
-    if process and process.name:lower() == constants.exe:lower() then
+    if process and isValidExe(process.name) then
       return process
     end
   end
@@ -93,7 +110,7 @@ end
 
 local function openProcess()
   for pid, name in memreader.processes() do
-    if name:lower() == constants.exe:lower() then
+    if isValidExe(name) then
       return assert(memreader.openprocess(pid))
     end
   end

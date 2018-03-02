@@ -45,4 +45,7 @@ return {
     worldGameBuffer=0x1C, -- relative to world address
     worldGameMask=0x24, -- relative to world address
   },
+  ["d2se"] = {
+    d2version=0x1A049, -- relative to d2se.exe address
+  }
 }

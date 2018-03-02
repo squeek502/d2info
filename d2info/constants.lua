@@ -19,6 +19,7 @@ return {
   },
 
   exe = "Game.exe",
+  d2seExe = "D2SE.exe",
   windowTitle = "Diablo II",
 
   gui = {

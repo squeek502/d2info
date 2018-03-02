@@ -16,7 +16,7 @@ Currently, it provides the following information:
 - Number of experience 'ticks' gained (pixels filled in the experience bar)
 - Information about the current area, like monster level and % xp gain (unfinished, disabled by default; see `SHOW_AREA_INFORMATION` in the config)
 
-Supports Diablo II verisons 1.13c, 1.13d, 1.14b, 1.14c, and 1.14d
+Supports Diablo II versions 1.13c, 1.13d, 1.14b, 1.14c, and 1.14d (D2SE and/or PlugY are also supported)
 
 ## Installation
 
