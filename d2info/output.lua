@@ -28,10 +28,6 @@ function Output:toScreen(state)
     self:buffer("%s (level %d & %.2f%%)", state.player, state.level, expToPercentLeveled(state.exp, state.level)*100)
     self:buffer("/players %d", state.playersX)
 
-    if state:isPaused() then
-      print("\n[PAUSED]")
-    end
-
     if current then
       self:buffer("\nRun #%d:", total.runs+1)
       self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(current:durationExpPerMin()), friendlyNumber(current:expGained()), friendlyTime(current:getAdjustedGameTime()))
