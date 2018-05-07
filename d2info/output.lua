@@ -15,67 +15,77 @@ function Output.new(outputDir)
   return self
 end
 
+function Output:buffer(str, ...)
+  table.insert(self.buf, string.format(str, ...))
+end
+
 function Output:toScreen(state)
   os.execute('cls')
+  self.buf = {}
   if state.ingame then
     local sessions = state:getSessions()
     local total, current, last = sessions.total, sessions.current, sessions.last
-    printf("%s (level %d & %.2f%%)", state.player, state.level, expToPercentLeveled(state.exp, state.level)*100)
-    printf("/players %d", state.playersX)
+    self:buffer("%s (level %d & %.2f%%)", state.player, state.level, expToPercentLeveled(state.exp, state.level)*100)
+    self:buffer("/players %d", state.playersX)
 
     if state:isPaused() then
       print("\n[PAUSED]")
     end
 
     if current then
-      printf("\nRun #%d:", total.runs+1)
-      printf(" %s xp/min (%s xp in %s)", friendlyNumber(current:durationExpPerMin()), friendlyNumber(current:expGained()), friendlyTime(current:getAdjustedGameTime()))
-      printf(" %s until level %d at this rate", friendlyTime(current:gameTimeToNextLevel()), state.level+1)
+      self:buffer("\nRun #%d:", total.runs+1)
+      self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(current:durationExpPerMin()), friendlyNumber(current:expGained()), friendlyTime(current:getAdjustedGameTime()))
+      self:buffer(" %s until level %d at this rate", friendlyTime(current:gameTimeToNextLevel()), state.level+1)
     end
 
     if last then
-      printf("\nLast run:")
-      printf(" %s xp/min (%s xp in %s)", friendlyNumber(last:durationExpPerMin()), friendlyNumber(last:expGained()), friendlyTime(last:getAdjustedGameTime()))
-      printf(" %s until level %d at this rate", friendlyTime(last:gameTimeToNextLevel()), state.level+1)
+      self:buffer("\nLast run:")
+      self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(last:durationExpPerMin()), friendlyNumber(last:expGained()), friendlyTime(last:getAdjustedGameTime()))
+      self:buffer(" %s until level %d at this rate", friendlyTime(last:gameTimeToNextLevel()), state.level+1)
     end
 
     if total.runs > 0 then
-      printf("\nAverage run:")
-      printf(" %s xp/min (%s xp in %s)", friendlyNumber(total:averageExpPerMinPerRun()), friendlyNumber(total:averageExpPerRun()), friendlyTime(total:averageGameTimePerRun()))
+      self:buffer("\nAverage run:")
+      self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(total:averageExpPerMinPerRun()), friendlyNumber(total:averageExpPerRun()), friendlyTime(total:averageGameTimePerRun()))
       local runsNeeded = total:runsToNextLevel()
-      printf(" %s runs until level %d", runsNeeded and string.format("%d", runsNeeded) or "-", state.level+1)
+      self:buffer(" %s runs until level %d", runsNeeded and string.format("%d", runsNeeded) or "-", state.level+1)
     end
 
     if total then
-      printf("\nThis session:")
+      self:buffer("\nThis session:")
       local percentGain = expToPercentLeveled(state.exp, state.level) - expToPercentLeveled(total.startExp, state.level)
-      printf(" %s%.1f ticks (%s%.2f%%)", total:ticksGained() >= 0 and "+" or "", total:ticksGained(), percentGain >= 0 and "+" or "", percentGain*100)
-      printf(" %s xp/min (%s xp in %s)", friendlyNumber(total:durationExpPerMin()), friendlyNumber(total:expGained()), friendlyTime(total.runsTotalDuration + current:getAdjustedGameTime()))
-      printf(" %s until level %d at this rate", friendlyTime(total:gameTimeToNextLevel()), state.level+1)
+      self:buffer(" %s%.1f ticks (%s%.2f%%)", total:ticksGained() >= 0 and "+" or "", total:ticksGained(), percentGain >= 0 and "+" or "", percentGain*100)
+      self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(total:durationExpPerMin()), friendlyNumber(total:expGained()), friendlyTime(total.runsTotalDuration + current:getAdjustedGameTime()))
+      self:buffer(" %s until level %d at this rate", friendlyTime(total:gameTimeToNextLevel()), state.level+1)
     end
 
     --[[
-    printf("Real-time:")
-    printf(" %s xp/min (in %s)", friendlyNumber(total:realTimeExpPerMin()), friendlyTime(os.time() - total.startTime))
-    printf(" %s until level %d in real-time", friendlyTime(total:gameTimeToNextLevel()), state.level+1)
+    self:buffer("Real-time:")
+    self:buffer(" %s xp/min (in %s)", friendlyNumber(total:realTimeExpPerMin()), friendlyTime(os.time() - total.startTime))
+    self:buffer(" %s until level %d in real-time", friendlyTime(total:gameTimeToNextLevel()), state.level+1)
     ]]--
 
     if state.config:get("SHOW_AREA_INFORMATION") then
       if state.area and state.difficulty and not state.area.town then
         local alvl = state.area.alvl[state.difficulty.code]
-        printf("\n%s [%s] alvl=%d", state.area.name, state.difficulty.name, alvl)
-        printf("Experience gain at level %d: %0.4f%%", state.level, utils.expLevelPenalty(state.level)*100)
-        printf("Monsters (lvl%d): \t%0.4f%% exp", alvl, utils.expGain(alvl, state.level)*100)
-        printf("Champions (lvl%d): \t%0.4f%% exp", alvl+2, utils.expGain(alvl+2, state.level)*100)
-        printf("Uniques (lvl%d): \t%0.4f%% exp", alvl+3, utils.expGain(alvl+3, state.level)*100)
+        self:buffer("\n%s [%s] alvl=%d", state.area.name, state.difficulty.name, alvl)
+        self:buffer("Experience gain at level %d: %0.4f%%", state.level, utils.expLevelPenalty(state.level)*100)
+        self:buffer("Monsters (lvl%d): \t%0.4f%% exp", alvl, utils.expGain(alvl, state.level)*100)
+        self:buffer("Champions (lvl%d): \t%0.4f%% exp", alvl+2, utils.expGain(alvl+2, state.level)*100)
+        self:buffer("Uniques (lvl%d): \t%0.4f%% exp", alvl+3, utils.expGain(alvl+3, state.level)*100)
       end
     end
   else
-    print(state.reader.status or "No player")
+    self:buffer(state.reader.status or "No player")
   end
+  print(table.concat(self.buf, '\n'))
 end
 
 function Output:toFile(state)
+  if self.buf and #self.buf > 0 then
+    toFile(self.outputDir .. "/console-output.txt", table.concat(self.buf, '\n'))
+  end
+
   local sessions = state:getSessions()
   if not sessions then return end
   local total, current, last = sessions.total, sessions.current, sessions.last
