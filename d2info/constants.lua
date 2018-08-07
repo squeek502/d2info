@@ -110,6 +110,8 @@ return {
     magicFind               = 80,
     knockback               = 81,
 
+    increasedExp            = 85,
+
     lightRadius             = 89,
     increasedAttackSpeed    = 93,
     fasterRunWalk           = 96,
@@ -231,6 +233,8 @@ return {
     3229426756,
     3520485254
   },
+
+  experienceCap = 0x7fffff,
 
   experienceLevelPenalties = {
     [70] = 0.9531,
@@ -408,5 +412,9 @@ return {
     {id=130, act=5, name="The Worldstone Keep Level 3", alvl={normal=42, nightmare=66, hell=85}},
     {id=131, act=5, name="Throne of Destruction", alvl={normal=43, nightmare=66, hell=85}},
     {id=132, act=5, name="The Worldstone Chamber", alvl={normal=43, nightmare=66, hell=85}},
+    {id=133, act=5, name="Matron's Den", alvl={normal=50, nightmare=75, hell=83}},
+    {id=134, act=5, name="Forgotten Sands", alvl={normal=50, nightmare=75, hell=83}},
+    {id=135, act=5, name="Furnace of Pain", alvl={normal=50, nightmare=75, hell=83}},
+    {id=136, act=5, name="Chaos Tristram", alvl={normal=50, nightmare=75, hell=83}},
   },
 }

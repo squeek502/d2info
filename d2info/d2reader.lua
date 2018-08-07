@@ -191,6 +191,29 @@ function D2Reader:getExperience()
   end
 end
 
+-- returns the percent increased experience gain of the current player
+-- (from shrines, gear, charms, etc) as a float (0.5 = 50% increased exp)
+function D2Reader:getIncreasedExperience()
+  if not self:checkStatus() then return end
+  local player = self:getPlayerPointer()
+  if player then
+    local playerStatListPtr = uint32(assert(self.process:read(player + self.offsets.statList, 4)))
+    local fullStatsData = assert(self.process:read(playerStatListPtr + self.offsets.fullStats, 8))
+    local fullStatsPtr = uint32(fullStatsData)
+    local fullStatsLength = uint16(fullStatsData, 4)
+    local fullStatsArray = assert(self.process:read(fullStatsPtr, fullStatsLength * 8))
+
+    for i=0,fullStatsLength-1 do
+      local start = i*8
+      local lo, v = uint16(fullStatsArray, start+2), uint32(fullStatsArray, start+4)
+      if lo == constants.stats.increasedExp then
+        return v / 100
+      end
+    end
+  end
+  return 0
+end
+
 function D2Reader:getArea()
   if not self:checkStatus() then return end
   local area = string.byte(assert(self.process:read(self.base + self.offsets.area, 1)))
