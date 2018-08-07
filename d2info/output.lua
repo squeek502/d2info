@@ -51,7 +51,7 @@ function Output:toScreen(state)
       self:buffer("\nThis session:")
       local percentGain = expToPercentLeveled(state.exp, state.level) - expToPercentLeveled(total.startExp, state.level)
       self:buffer(" %s%.1f ticks (%s%.2f%%)", total:visualTicksGained() >= 0 and "+" or "", total:visualTicksGained(), percentGain >= 0 and "+" or "", percentGain*100)
-      self:buffer(" Next tick in %s xp", friendlyNumber(utils.expToNextVisualTick(state.exp, state.level)))
+      self:buffer(" Next visual tick in %s xp", friendlyNumber(utils.expToNextVisualTick(state.exp, state.level)))
       self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(total:durationExpPerMin()), friendlyNumber(total:expGained()), friendlyTime(total.runsTotalDuration + current:getAdjustedGameTime()))
       self:buffer(" %s until level %d at this rate", friendlyTime(total:gameTimeToNextLevel()), state.level+1)
     end
