@@ -73,6 +73,27 @@ function utils.expToTicks(exp, level)
   return percentLeveled * maxTicks
 end
 
+-- The GUI bar is full at 119 ticks rather than the full 120
+-- (i.e. with the XP bar totally full there is still 1 tick left to gain)
+-- so this can be used to determine whether or not a tick has actually
+-- appeared on the XP bar GUI
+function utils.expToVisualTicks(exp, level)
+  if level == 99 then return 0 end
+  local maxVisualTicks = constants.gui.expBar.ticks - 1
+  local percentLeveled = utils.expToPercentLeveled(exp, level)
+  return percentLeveled * maxVisualTicks
+end
+
+function utils.expToNextVisualTick(exp, level)
+  if level == 99 then return 0 end
+  local maxVisualTicks = constants.gui.expBar.ticks - 1
+  local expRange = constants.experience[level+1] - constants.experience[level]
+  local expGotten = exp - constants.experience[level]
+  local expPerVisualTick = math.floor(expRange / maxVisualTicks)
+  print(expGotten, expPerVisualTick)
+  return expPerVisualTick - (expGotten % expPerVisualTick)
+end
+
 local underLevel25 = {
   [10] = 0.02, [9] = 0.15, [8] = 0.36, [7] = 0.68, [6] = 0.88, [-6] = 0.81, [-7] = 0.62, [-8] = 0.43, [-9] = 0.24, [-10] = 0.05
 }

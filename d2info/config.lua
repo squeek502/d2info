@@ -30,6 +30,9 @@ return {
   -- show information about the area you are currently in, such as: area level,
   -- percentage xp gain from monsters/champions/uniques in that area, etc
   SHOW_AREA_INFORMATION = false,
+
+  -- time in seconds to make tick-party.txt non-empty after gaining an XP tick
+  TICK_PARTY_DURATION = 30,
 }
 ]]
 

@@ -17,6 +17,8 @@ function Session.new(startExp, startLevel, maxDurationPerTown)
   self.level = startLevel
   self.runs = 0
   self.runsTotalDuration = 0
+  self.lastTick = nil
+  self.lastTickNum = self:visualTick()
   return self
 end
 
@@ -38,6 +40,12 @@ function Session:update(dt, state)
   end
   self.exp = state.exp
   self.level = state.level
+
+  -- check for tick party
+  if self:visualTick() == self.lastTickNum+1 then
+    self.lastTick = os.time()
+  end
+  self.lastTickNum = self:visualTick()
 end
 
 function Session:expGained()
@@ -47,6 +55,15 @@ end
 function Session:ticksGained()
   local gainedIntoLevel = constants.experience[self.level] + self:expGained()
   return utils.expToTicks(gainedIntoLevel, self.level)
+end
+
+function Session:visualTicksGained()
+  local gainedIntoLevel = constants.experience[self.level] + self:expGained()
+  return utils.expToVisualTicks(gainedIntoLevel, self.level)
+end
+
+function Session:visualTick()
+  return math.floor(utils.expToVisualTicks(self.exp, self.level))
 end
 
 function Session:getAdjustedGameTime()

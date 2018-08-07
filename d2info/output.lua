@@ -51,6 +51,7 @@ function Output:toScreen(state)
       self:buffer("\nThis session:")
       local percentGain = expToPercentLeveled(state.exp, state.level) - expToPercentLeveled(total.startExp, state.level)
       self:buffer(" %s%.1f ticks (%s%.2f%%)", total:ticksGained() >= 0 and "+" or "", total:ticksGained(), percentGain >= 0 and "+" or "", percentGain*100)
+      self:buffer(" Next tick in %s xp", friendlyNumber(utils.expToNextVisualTick(state.exp, state.level)))
       self:buffer(" %s xp/min (%s xp in %s)", friendlyNumber(total:durationExpPerMin()), friendlyNumber(total:expGained()), friendlyTime(total.runsTotalDuration + current:getAdjustedGameTime()))
       self:buffer(" %s until level %d at this rate", friendlyTime(total:gameTimeToNextLevel()), state.level+1)
     end
@@ -103,10 +104,17 @@ function Output:toFile(state)
   local runsNeeded = total:runsToNextLevel()
   toFile(self.outputDir .. "/runs-average-timetolevel.txt", runsNeeded and string.format("%d", runsNeeded) or "-")
 
+  if total.lastTick and total.lastTick + state.config:get("TICK_PARTY_DURATION") > os.time() then
+    toFile(self.outputDir .. "/tick-party.txt", "party")
+  else
+    toFile(self.outputDir .. "/tick-party.txt", "")
+  end
+
   if state.ingame then
     toFile(self.outputDir .. "/level.txt", state.level)
     toFile(self.outputDir .. "/level-next.txt", state.level+1)
     toFile(self.outputDir .. "/players-x.txt", state.playersX)
+    toFile(self.outputDir .. "/next-tick-in-xp.txt", friendlyNumber(utils.expToNextVisualTick(state.exp, state.level)))
   end
 end
 
