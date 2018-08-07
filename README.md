@@ -53,9 +53,18 @@ Average run:
 
 This session:
  +1.6 ticks (+1.36%)
+ Next tick in 675.2k xp
  177.8k xp/min (3.3m xp in 19m19s)
  15h until level 97 at this rate
 ```
+
+### Tick Party
+
+The file `output/tick-party.txt` can be used in conjunction with [the OBS script Txt Trigger](https://obsproject.com/forum/resources/txt-trigger.710/) to show OBS source(s) (video, audio, etc) whenever an experience tick is gained (i.e. when a new pixel is filled in).
+
+![Txt Trigger settings](https://www.ryanliptak.com/misc/txt-trigger.png)
+
+The above settings will use the d2info config option `TICK_PARTY_DURATION` for the amount of time the source(s) are shown. Alternatively, you can uncheck 'Make source(s) visible for as long as file contents match' and set the duration in OBS.
 
 ## Acknowledgements
 
