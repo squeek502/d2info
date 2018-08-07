@@ -90,7 +90,6 @@ function utils.expToNextVisualTick(exp, level)
   local expRange = constants.experience[level+1] - constants.experience[level]
   local expGotten = exp - constants.experience[level]
   local expPerVisualTick = math.floor(expRange / maxVisualTicks)
-  print(expGotten, expPerVisualTick)
   return expPerVisualTick - (expGotten % expPerVisualTick)
 end
 
