@@ -1,6 +1,6 @@
 local utils = require('d2info.utils')
 local lfs = require('lfs')
-local printf, friendlyNumber, friendlyTime, toFile = utils.printf, utils.friendlyNumber, utils.friendlyTime, utils.toFile
+local friendlyNumber, friendlyTime, toFile = utils.friendlyNumber, utils.friendlyTime, utils.toFile
 local expToPercentLeveled = utils.expToPercentLeveled
 
 local Output = {}
@@ -26,7 +26,11 @@ function Output:toScreen(state)
     local sessions = state:getSessions()
     local total, current, last = sessions.total, sessions.current, sessions.last
     self:buffer("%s (level %d & %.2f%%)", state.player, state.level, expToPercentLeveled(state.exp, state.level)*100)
-    self:buffer("/players %d", state.playersX)
+    if state.multiplayer then
+      self:buffer("Multiplayer")
+    else
+      self:buffer("/players %d", state.playersX)
+    end
 
     if current then
       self:buffer("\nRun #%d:", total.runs+1)

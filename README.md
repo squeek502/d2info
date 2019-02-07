@@ -16,7 +16,7 @@ Currently, it provides the following information:
 - Number of experience 'ticks' gained (pixels filled in the experience bar)
 - Information about the current area, like monster level and % xp gain (unfinished, disabled by default; see `SHOW_AREA_INFORMATION` in the config)
 
-Supports Diablo II versions 1.13c, 1.13d, 1.14b, 1.14c, and 1.14d (D2SE and/or PlugY are also supported)
+Supports Diablo II versions 1.13c, 1.13d, 1.14b, 1.14c, and 1.14d (D2SE and/or PlugY are also supported). It can also be used on LAN and private multiplayer servers (if it's allowed), however **it is not recommended to use it on Battle.net**, as it will most likely be considered a cheat and could result in a ban.
 
 ## Installation
 

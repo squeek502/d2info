@@ -15,8 +15,12 @@ function GameState.new(reader, config, output)
   return self
 end
 
-function GameState:inValidGame()
-  return self.reader:getGamePointer() ~= nil and self.reader:getExperience() ~= nil
+function GameState:inValidGame(multiplayer)
+  return (multiplayer or self.reader:getGamePointer() ~= nil) and self.reader:getExperience() ~= nil
+end
+
+function GameState:inMultiplayerGame()
+  return self.reader:getGamePointer() == nil and self.reader:getExperience() ~= nil
 end
 
 function GameState:inTown()
@@ -24,7 +28,7 @@ function GameState:inTown()
 end
 
 function GameState:isPaused()
-  return self.ingame and self.lastFrameNumber and self.lastFrameNumber == self.frameNumber
+  return not self.multiplayer and self.ingame and self.lastFrameNumber and self.lastFrameNumber == self.frameNumber
 end
 
 function GameState:setupCurrentSession()
@@ -57,7 +61,8 @@ function GameState:getSessions()
 end
 
 function GameState:tick(ms)
-  self.ingame = self:inValidGame()
+  self.multiplayer = self:inMultiplayerGame()
+  self.ingame = self:inValidGame(self.multiplayer)
   if self.ingame then
     -- read current state
     self.player = self.reader:getPlayerName()
