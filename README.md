@@ -20,14 +20,14 @@ Supports Diablo II versions 1.13c, 1.13d, 1.14b, 1.14c, and 1.14d (D2SE and/or P
 
 ## Installation
 
-Simply grab the [latest .exe build from the releases page](https://github.com/squeek502/d2info/releases/latest) and run it.
+Simply grab the [latest .exe build from the releases page](https://github.com/squeek502/d2info/releases/latest) and run it (as administrator).
 
 *Note: You'll probably want to put the .exe in its own folder, as it will output various files relative to its location*
 
 ## Running using Lua
 
 - Clone this repository
-- Build [memreader](https://github.com/squeek502/memreader), [sleep](https://github.com/squeek502/sleep), [luafilesystem](https://github.com/keplerproject/luafilesystem), and [LuaBitOp](http://bitop.luajit.org/) and make the resulting .dll's available to Lua's `package.cpath`.
+- Build [memreader](https://github.com/squeek502/memreader), [sleep](https://github.com/squeek502/sleep), [windcon](https://github.com/squeek502/lua-windcon), [luafilesystem](https://github.com/keplerproject/luafilesystem), and [LuaBitOp](http://bitop.luajit.org/) and make the resulting .dll's available to Lua's `package.cpath`.
 - Run `lua d2info.lua`
 
 ## Output

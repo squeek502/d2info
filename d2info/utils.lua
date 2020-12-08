@@ -133,4 +133,29 @@ function utils.expGain(mlvl, clvl)
   return utils.expLevelDifference(mlvl, clvl) * utils.expLevelPenalty(clvl)
 end
 
+-- replace all non-whitespace characters with space characters
+-- e.g. "ab\n \t c" should become "  \n \t  "
+function utils.makeWhitespace(str)
+  return str:gsub("[^\n\r\t ]", " ")
+end
+
+-- add space characters to a buf in order to
+-- make it completely overwrite the previous buf
+function utils.padBuf(cur, last)
+  if not last then return cur end
+  local padded = {}
+  for i,v in ipairs(cur) do
+    padded[i] = v
+  end
+  for i,v in ipairs(last) do
+    if not cur[i] then
+      padded[i] = utils.makeWhitespace(v)
+    elseif #cur[i] < #v then
+      local remainder = v:sub(#cur[i])
+      padded[i] = cur[i] .. utils.makeWhitespace(remainder)
+    end
+  end
+  return padded
+end
+
 return utils

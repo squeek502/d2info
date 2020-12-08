@@ -2,6 +2,7 @@ local utils = require('d2info.utils')
 local lfs = require('lfs')
 local friendlyNumber, friendlyTime, toFile = utils.friendlyNumber, utils.friendlyTime, utils.toFile
 local expToPercentLeveled = utils.expToPercentLeveled
+local windcon = require('windcon')
 
 local Output = {}
 Output.__index = Output
@@ -20,7 +21,8 @@ function Output:buffer(str, ...)
 end
 
 function Output:toScreen(state)
-  os.execute('cls')
+  local lastbuf = self.buf
+  windcon.movecursor(0,0)
   self.buf = {}
   if state.ingame then
     local sessions = state:getSessions()
@@ -79,7 +81,8 @@ function Output:toScreen(state)
   else
     self:buffer(state.reader.status or "No player")
   end
-  print(table.concat(self.buf, '\n'))
+  local paddedBuf = utils.padBuf(self.buf, lastbuf)
+  print(table.concat(paddedBuf, '\n'))
 end
 
 function Output:toFile(state)

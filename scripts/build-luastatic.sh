@@ -17,6 +17,7 @@ LUA_VERSION=5.1.5
 LFS_VERSION=1.7.0-2
 SLEEP_VERSION=1.0.0-2
 MEMREADER_VERSION=1.0.0-1
+WINDCON_VERSION=1.0.0-1
 BITOP_VERSION=1.0.2-3
 
 # ensure luastatic and luarocks are available
@@ -32,6 +33,11 @@ echo
 echo "=== Downloading memreader $MEMREADER_VERSION ==="
 echo
 luarocks unpack memreader $MEMREADER_VERSION
+
+echo
+echo "=== Downloading windcon $WINDCON_VERSION ==="
+echo
+luarocks unpack windcon $WINDCON_VERSION
 
 echo
 echo "=== Downloading sleep $SLEEP_VERSION ==="
@@ -63,6 +69,15 @@ cd memreader-$MEMREADER_VERSION/memreader
 cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
 make
 cp libmemreader.a $BUILD_DIR
+cd $BUILD_DIR
+
+echo
+echo "=== Building windcon ==="
+echo
+cd windcon-$WINDCON_VERSION/windcon
+cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
+make
+cp libwindcon.a $BUILD_DIR
 cd $BUILD_DIR
 
 echo
@@ -101,7 +116,7 @@ cp $ROOT_DIR/d2info.lua $BUILD_DIR
 echo
 echo "=== Building d2info.exe ==="
 echo
-CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libsleep.a lfs.a bit.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
+CC=x86_64-w64-mingw32-gcc luastatic d2info.lua d2info/*.lua liblua.a libmemreader.a libwindcon.a libsleep.a lfs.a bit.a /usr/x86_64-w64-mingw32/lib/libversion.a /usr/x86_64-w64-mingw32/lib/libpsapi.a -Ilua-$LUA_VERSION/src
 strip d2info.exe
 
 cd $ROOT_DIR
