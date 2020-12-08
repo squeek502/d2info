@@ -74,7 +74,7 @@ cd $BUILD_DIR
 echo
 echo "=== Building windcon ==="
 echo
-cd windcon-$WINDCON_VERSION/windcon
+cd windcon-$WINDCON_VERSION/lua-windcon
 cmake -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/scripts/toolchain-mingw.cmake -DLUA_LIBRARIES=$BUILD_DIR/liblua.a -DLUA_INCLUDE_DIR=$BUILD_DIR/lua-$LUA_VERSION/src .
 make
 cp libwindcon.a $BUILD_DIR
