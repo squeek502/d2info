@@ -1,6 +1,6 @@
 # d2info
 
-[![Build Status](https://travis-ci.org/squeek502/d2info.svg?branch=master)](https://travis-ci.org/squeek502/d2info)
+[![Build Status](https://github.com/squeek502/d2info/workflows/CI/badge.svg)](https://github.com/squeek502/d2info/actions)
 
 d2info is a tool for viewing/outputting various information about a running Diablo II game (by reading the memory used by the game).
 
